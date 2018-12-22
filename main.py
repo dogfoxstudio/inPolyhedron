@@ -1,35 +1,28 @@
-"""
-points = [[0,0,0],\
-         [3,0,0],\
-         [0,6,0],\
-         [4,3,0],\
-         [1,1,3],\
-         [3,0,3],\
-         [0,4,3],\
-         [4,3,4],\
-        ]
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+import sqlite3
 
-polygons = [
-        [points[0], points[1], points[3], points[2], points[0]],\
-        [points[0], points[4], points[5], points[1], points[0]],\
-        [points[1], points[5], points[7], points[3], points[1]],\
-        [points[3], points[7], points[6], points[2], points[3]],\
-        [points[0], points[4], points[6], points[2], points[0]],\
-        [points[4], points[5], points[7], points[6], points[4]]\
-        ]
-        
-xt1 = 2 # IN
-yt1 = 2
-zt1 = 2
-xt2 = 0 # OUT
-yt2 = 0
-zt2 = 4
-xt3 = 5 # OUT
-yt3 = 5
-zt3 = 3
-"""
+dots = []
+polygons = []
 
+def getFigure(db_name):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    for id in cursor.execute("SELECT x,y,z FROM dots"):
+        #print(id)
+        dots.append(id)
+    #print(dots)
+
+    for id in cursor.execute("SELECT * FROM polygons;"):
+        #print(id[1::])
+        polygons.append(list(id[1::]))
+    for i in range(len(polygons)):
+        polygons[i].append(polygons[i][0])
+        for j in range(len(polygons[i])):
+            polygons[i][j] = dots[polygons[i][j] - 1]
+    #print(polygons)
+    
 def isIn(plg, x, y, z):
     pos = False
     for polygon in polygons:
@@ -67,20 +60,21 @@ def isIn(plg, x, y, z):
             
             return False
     return pos
+            
 
-points = [[0,0,0],\
-         [10,0,0],\
-         [0,10,0],\
-         [0,0,5]\
-         ]     
-         #костыль чтобы замкнуть многоугольник
-polygons = [
-        [points[0], points[1], points[2], points[0]],\
-        [points[0], points[2], points[3], points[0]],\
-        [points[0], points[1], points[3], points[0]],\
-        [points[1], points[2], points[3], points[1]]\
-        ]
-        
+getFigure("polyhedron.db")
 
+#print(dots)
+#print(polygons)
+
+xt1 = 2 # IN
+yt1 = 2
+zt1 = 2
+xt2 = 0 # OUT
+yt2 = 0
+zt2 = 4
+xt3 = 5 # OUT
+yt3 = 5
+zt3 = 3
 
 print(isIn(polygons, 1,2,1))
